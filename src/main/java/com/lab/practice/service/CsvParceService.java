@@ -31,7 +31,6 @@ public class CsvParceService {
     private Film creatingFilm(String[] array) {
         Film film = new Film();
         film.setTitle(array[0]);
-        System.out.println(film.getTitle());
         film.setReleaseDate(array[1]);
         film.setColor(array[2]);
         film.setGenre(array[3]);
