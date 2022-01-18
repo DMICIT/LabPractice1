@@ -4,6 +4,7 @@ import com.lab.practice.entity.Film;
 import com.lab.practice.repository.FilmRepository;
 import com.lab.practice.service.CsvParceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +20,7 @@ public class FilmController {
     @Autowired
     CsvParceService csvParceService;
 
-    @RequestMapping(value = "/films")
+    @GetMapping(value = "/films")
     public List<Film> viewFilmList(@RequestParam String fileName){
 
         List<Film> films = csvParceService.parseCsvFile(fileName);
