@@ -12,12 +12,14 @@ public class CountingController {
     CountingService countingService;
 
     @GetMapping(value = "/maxValue")
-    public long getMaxValue(@RequestParam String fileName){
-       return countingService.maxValue(fileName);
+    public long getMaxValue(@RequestParam String fileName ,
+                            @RequestParam String columnName){
+       return countingService.maxValue(fileName, columnName);
     }
 
     @GetMapping(value = "/sum")
-    public long getSum(@RequestParam String fileName){
-        return countingService.sum(fileName);
+    public long getSum(@RequestParam String fileName,
+                       @RequestParam String columnName){
+        return countingService.sum(fileName, columnName);
     }
 }

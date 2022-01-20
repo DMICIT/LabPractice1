@@ -11,8 +11,7 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 
 
-@ExtendWith(MockitoExtension.class)
-public class CountingServiceTest {
+/* public class CountingServiceTest {
 
     @InjectMocks
     private CountingService countingService;
@@ -50,4 +49,4 @@ public class CountingServiceTest {
         Assert.assertEquals(600L, sum);
     }
 
-}
+}*/
