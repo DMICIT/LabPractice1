@@ -12,8 +12,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class CsvParceService {
+
     @Autowired
-    FileStorageService fileStorageService;
+    StorageService fileStorageService;
 
     public List<Film> parseCsvFile(String filename) {
         try {

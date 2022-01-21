@@ -1,5 +1,6 @@
 package com.lab.practice.validation;
 
+import com.lab.practice.entity.FileBucket;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -11,11 +12,12 @@ public class FileValidation implements Validator {
     @Override
     public void validate (Object uploadedFile, Errors errors) {
 
-        MultipartFile file = (MultipartFile) uploadedFile;
-        if(file.isEmpty() || file.getSize()==0){
+        FileBucket file = (FileBucket) uploadedFile;
+        MultipartFile multipartFile = file.getFile();
+        if(multipartFile.isEmpty() || multipartFile.getSize()==0){
             errors.rejectValue("file", "Please select a file");
         }
-        if(!file.getContentType().endsWith("csv")){
+        if(!multipartFile.getContentType().endsWith("csv")){
             errors.rejectValue("file", "Please select a csv file");
         }
     }

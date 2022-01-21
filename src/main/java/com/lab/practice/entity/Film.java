@@ -39,5 +39,8 @@ public class Film {
     long revenue;
     long budget;
 
-
+    public Film(String title, String genre) {
+        this.title = title;
+        this.genre = genre;
+    }
 }

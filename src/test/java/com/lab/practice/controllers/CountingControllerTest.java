@@ -1,48 +1,61 @@
 package com.lab.practice.controllers;
 
-import com.lab.practice.entity.Film;
 import com.lab.practice.service.CountingService;
-import org.junit.Assert;
+import com.lab.practice.service.StorageService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-import static org.mockito.Mockito.when;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class CountingControllerTest {
 
 
-//?class CountingControllerTest {
-//
-//    @InjectMocks
-//    private CountingController countingController;
-//
-//    @Mock
-//    private CountingService countingService;
-//
-//    private String fileName = " test.csv";
-//
-//
-//    @Test
-//    void getMaxValue() {
-//
-//        when(countingService.maxValue(fileName)).thenReturn(100L);
-//
-//        long result = countingController.getMaxValue(fileName);
-//
-//        Assert.assertEquals(100L, result);
-//
-//    }
-//
-//    @Test
-//    void getSum() {
-//        when(countingService.sum(fileName)).thenReturn(200L);
-//        long sum = countingController.getSum(fileName);
-//
-//        Assert.assertEquals(200L, sum);
-//    }
-//
-//}
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @MockBean
+    private CountingService countingService;
+
+
+
+    @Test
+    void getMaxValue() {
+
+        given(countingService.maxValue("testFile.csv","budget")).willReturn(10l);
+
+        MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
+        map.add("fileName","testFile.csv");
+        map.add("columnName","budget");
+
+        ResponseEntity<Long> entity = restTemplate.getForEntity("/maxValue?fileName=IMDb_Movie_Database.csv&columnName=budget", Long.class, map);
+        assertThat(entity.getStatusCode().is2xxSuccessful());
+        assertThat(entity.getBody().equals(10l));
+
+
+    }
+
+    @Test
+    void getSum() {
+
+        given(countingService.sum("testFile.csv","budget")).willReturn(20L);
+
+        MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
+        map.add("fileName","testFile.csv");
+        map.add("columnName","budget");
+
+        ResponseEntity<Long> entity = restTemplate.getForEntity("/sum?fileName=IMDb_Movie_Database.csv&columnName=budget", Long.class, map);
+        assertThat(entity.getStatusCode().is2xxSuccessful());
+        assertThat(entity.getBody().equals(20L));
+
+    }
+}
