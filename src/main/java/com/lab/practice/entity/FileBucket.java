@@ -1,17 +1,15 @@
 package com.lab.practice.entity;
 
 import lombok.*;
-
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @EqualsAndHashCode
 
-
 public class FileBucket {
-    private MultipartFile file;
+   private MultipartFile file;
 }

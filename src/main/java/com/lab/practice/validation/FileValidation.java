@@ -12,8 +12,8 @@ public class FileValidation implements Validator {
     @Override
     public void validate (Object uploadedFile, Errors errors) {
 
-        FileBucket file = (FileBucket) uploadedFile;
-        MultipartFile multipartFile = file.getFile();
+        FileBucket fileBucket = (FileBucket) uploadedFile;
+        MultipartFile multipartFile = fileBucket.getFile();
         if(multipartFile.isEmpty() || multipartFile.getSize()==0){
             errors.rejectValue("file", "Please select a file");
         }

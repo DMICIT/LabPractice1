@@ -1,74 +1,60 @@
 package com.lab.practice.service;
 
 import com.lab.practice.entity.Film;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
+@ExtendWith(MockitoExtension.class)
 class CountingServiceTest {
 
-   @InjectMocks
-   CountingService countingService;
+    @InjectMocks
+    private CountingService countingService;
 
+    private CsvParceService csvParceService;
     @Mock
-    CsvParceService csvParceService;
+    private FileStorageService storageService;
+
+    private final String fileName = "serviceTestFile.csv";
+
+    @BeforeEach
+    void setUp() {
+        csvParceService = new CsvParceService();
+        csvParceService.fileStorageService = storageService;
+        countingService.csvParceService = csvParceService;
+    }
 
     @Test
-    void maxValue() {
+    void maxValue() throws IOException {
 
-        Film film1 = new Film();
-        Film film2 = new Film();
-        Film film3 = new Film();
-        film1.setRevenue(100L);
-        film2.setRevenue(300L);
-        film3.setRevenue(500L);
+        ClassPathResource resource = new ClassPathResource(fileName, getClass());
+        Path path = resource.getFile().toPath();
+        when(storageService.load(fileName)).thenReturn(path);
+        long result = countingService.maxValue(fileName, "budget");
 
-        List<Film> films = new ArrayList<>();
-        films.add(film1);
-        films.add(film2);
-        films.add(film3);
-
-        given(csvParceService.parseCsvFile("testFile.csv")).willReturn(films);
-
-        long maxValue = countingService.maxValue("testFile.csv", "revenue");
-        assertEquals(500L,maxValue);
+        Assertions.assertEquals(6000000, result);
 
     }
 
     @Test
-    void sum() {
+    void sum() throws IOException {
 
-        Film film1 = new Film();
-        Film film2 = new Film();
-        Film film3 = new Film( );
-        film1.setRevenue(100L);
-        film2.setRevenue(300L);
-        film3.setRevenue(500L);
+        ClassPathResource resource = new ClassPathResource(fileName, getClass());
+        Path path = resource.getFile().toPath();
+        when(storageService.load(fileName)).thenReturn(path);
+        long result = countingService.sum(fileName, "budget");
 
-        List<Film> films = new ArrayList<>();
-        films.add(film1);
-        films.add(film2);
-        films.add(film3);
-
-        given(csvParceService.parseCsvFile("testFile.csv")).willReturn(films);
-
-        long maxValue = countingService.sum("testFile.csv", "revenue");
-        long result = film1.getRevenue() + film2.getRevenue() + film3.getRevenue();
-
-        assertEquals(result,maxValue);
-
+        Assertions.assertEquals(11027000, result);
 
     }
 }

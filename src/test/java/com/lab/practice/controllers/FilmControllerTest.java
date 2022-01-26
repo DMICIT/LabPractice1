@@ -34,11 +34,11 @@ class FilmControllerTest {
             films.add(film2);
             films.add(film3);
 
-            given(csvParceService.parseCsvFile("testFile.csv")).willReturn(films);
+            given(csvParceService.parseCsvFile("controllerTestFile.csv")).willReturn(films);
 
             Map<String, String> map = new HashMap<>();
-            map.put("fileName", "testFile.csv");
-            ResponseEntity<String> response = restTemplate.getForEntity("/films?fileName=testFile.csv", String.class, "testFile.csv");
+            map.put("fileName", "controllerTestFile.csv");
+            ResponseEntity<String> response = restTemplate.getForEntity("/films?fileName=controllerTestFile.csv", String.class, "controllerTestFile.csv");
             assertThat(response.getStatusCode().is2xxSuccessful());
             assertThat(response.getBody()).contains("фильм1");
             assertThat(response.getBody()).contains("фильм2");

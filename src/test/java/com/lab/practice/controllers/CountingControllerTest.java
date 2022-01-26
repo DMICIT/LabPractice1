@@ -31,10 +31,10 @@ class CountingControllerTest {
     @Test
     void getMaxValue() {
 
-        given(countingService.maxValue("testFile.csv","budget")).willReturn(10l);
+        given(countingService.maxValue("controllerTestFile.csv","budget")).willReturn(10l);
 
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
-        map.add("fileName","testFile.csv");
+        map.add("fileName","controllerTestFile.csv");
         map.add("columnName","budget");
 
         ResponseEntity<Long> entity = restTemplate.getForEntity("/maxValue?fileName=IMDb_Movie_Database.csv&columnName=budget", Long.class, map);
@@ -47,10 +47,10 @@ class CountingControllerTest {
     @Test
     void getSum() {
 
-        given(countingService.sum("testFile.csv","budget")).willReturn(20L);
+        given(countingService.sum("controllerTestFile.csv","budget")).willReturn(20L);
 
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
-        map.add("fileName","testFile.csv");
+        map.add("fileName","controllerTestFile.csv");
         map.add("columnName","budget");
 
         ResponseEntity<Long> entity = restTemplate.getForEntity("/sum?fileName=IMDb_Movie_Database.csv&columnName=budget", Long.class, map);

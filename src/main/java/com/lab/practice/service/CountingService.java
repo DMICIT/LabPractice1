@@ -1,13 +1,15 @@
 package com.lab.practice.service;
 
 import com.lab.practice.entity.Film;
-import com.lab.practice.filters.FilmFilter;
+import com.lab.practice.filters.ColumnMapper;
+import com.lab.practice.filters.EFilterValues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Service
 public class CountingService {
@@ -15,39 +17,74 @@ public class CountingService {
     @Autowired
     CsvParceService csvParceService;
 
-    Map<String, FilmFilter> mapColumnName = new HashMap<>();
+    Map<String, ColumnMapper> mapColumnName = new HashMap<>();
+
     {
         mapColumnName.put("leadActor", film -> Long.parseLong(film.getLeadActor()));
-        mapColumnName.put("budget", film -> film.getBudget());
-        mapColumnName.put("castFb", film -> film.getCastFBLikes());
-        mapColumnName.put("directorFb", film -> film.getDirectorFBLikes());
-        mapColumnName.put("movieFb", film -> film.getMovieFBLikes());
+        mapColumnName.put("budget", Film::getBudget);
+        mapColumnName.put("castFb", Film::getCastFBLikes);
+        mapColumnName.put("directorFb", Film::getDirectorFBLikes);
+        mapColumnName.put("movieFb", Film::getMovieFBLikes);
         mapColumnName.put("imdb", film -> (long) film.getImdbScore());
-        mapColumnName.put("totalReview", film -> film.getTotalReview());
-        mapColumnName.put("duration", film -> film.getDuration());
-        mapColumnName.put("revenue", film -> film.getRevenue());
+        mapColumnName.put("totalReview", Film::getTotalReview);
+        mapColumnName.put("duration", Film::getDuration);
+        mapColumnName.put("revenue", Film::getRevenue);
     }
 
-    public long maxValue(String fileName, String columnName){
+    public long maxValue(String fileName, String columnName) {
         List<Film> films = csvParceService.parseCsvFile(fileName);
+        ColumnMapper columnMapper = mapColumnName.get(columnName);
+
+        if (columnMapper == null) {
+            throw new IllegalArgumentException("Not valid column");
+        }
         return films.stream()
-                .mapToLong(film -> mapColumnName.get(columnName).apply(film))
+                .mapToLong(columnMapper::apply)
                 .max()
                 .orElse(0);
     }
 
-    public long sum (String fileName, String columnName){
+    public long maxValue(String fileName, String columnName, String filterKey, String value) {
         List<Film> films = csvParceService.parseCsvFile(fileName);
+        ColumnMapper columnMapper = mapColumnName.get(columnName);
+        EFilterValues filterValue = Stream.of(EFilterValues.values())
+                .filter(eFilterValue -> eFilterValue.matchKey(filterKey))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Not valid column"));
+
+        if (columnMapper == null) {
+            throw new IllegalArgumentException("Not valid column");
+        }
         return films.stream()
-                .mapToLong(film -> mapColumnName.get(columnName).apply(film))
+                .filter(film -> filterValue.filter(film, value))
+                .mapToLong(columnMapper::apply)
+                .max()
+                .orElse(0);
+    }
+
+    public long sum(String fileName, String columnName) {
+        List<Film> films = csvParceService.parseCsvFile(fileName);
+        ColumnMapper columnMapper = mapColumnName.get(columnName);
+        if (columnMapper == null) {
+            throw new IllegalArgumentException("Not valid column");
+        }
+        return films.stream()
+                .mapToLong(columnMapper::apply)
                 .sum();
     }
 
-//    public List<Film> filterFilm (String fileName, String filterName, String value ){
-//        List<Film> films = csvParceService.parseCsvFile(fileName);
-//       return films.stream()
-//                .filter(film -> map1.get(filterName).apply(film, value))
-//                .sorted(Comparator.comparing(Film::getTitle))
-//                .collect(Collectors.toList());
-//    }
+    public long sum(String fileName, String columnName, String filterKey, String value) {
+        List<Film> films = csvParceService.parseCsvFile(fileName);
+        ColumnMapper columnMapper = mapColumnName.get(columnName);
+        EFilterValues filterValue = Stream.of(EFilterValues.values())
+                .filter(eFilterValues -> eFilterValues.matchKey(filterKey))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Not valid column"));
+        if (columnMapper == null) {
+            throw new IllegalArgumentException("Not valid column");
+        }
+        return films.stream().filter(film -> filterValue.filter(film,value))
+                .mapToLong(columnMapper::apply)
+                .sum();
+    }
 }
