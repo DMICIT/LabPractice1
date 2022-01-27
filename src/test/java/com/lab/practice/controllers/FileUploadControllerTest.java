@@ -16,15 +16,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class FileUploadControllerTest {
@@ -50,6 +47,7 @@ class FileUploadControllerTest {
         Map<String, Object> map = new HashMap<>();
         map.put("fileName", filename);
         ResponseEntity<String> response = restTemplate.getForEntity("/download?fileName="+filename, String.class, map);
+        String body = response.getBody();
 
         Assertions.assertEquals(200, response.getStatusCodeValue());
         Assertions.assertTrue(response.getBody().startsWith("Title;Release Date;Color/B&W;Genre;Language;Country"));

@@ -44,7 +44,9 @@ public class CountingService {
                 .orElse(0);
     }
 
+    // кто-то говорил что можно запихнуть до 4 параметров чтоб не создавать новый объект. Так вот ... ))
     public long maxValue(String fileName, String columnName, String filterKey, String value) {
+
         List<Film> films = csvParceService.parseCsvFile(fileName);
         ColumnMapper columnMapper = mapColumnName.get(columnName);
         EFilterValues filterValue = Stream.of(EFilterValues.values())
@@ -83,7 +85,7 @@ public class CountingService {
         if (columnMapper == null) {
             throw new IllegalArgumentException("Not valid column");
         }
-        return films.stream().filter(film -> filterValue.filter(film,value))
+        return films.stream().filter(film -> filterValue.filter(film, value))
                 .mapToLong(columnMapper::apply)
                 .sum();
     }

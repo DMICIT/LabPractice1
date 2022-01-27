@@ -13,11 +13,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 
@@ -30,18 +30,21 @@ class CsvParceServiceTest {
     @Mock
     private FileStorageService storageService;
 
+    private String fileName = "serviceTestFile.csv";
+
     @Test
     public void parseCsvFileTest() throws IOException {
 
-        String fileName = "serviceTestFile.csv";
         ClassPathResource resource = new ClassPathResource(fileName, getClass());
         Path path = resource.getFile().toPath();
 
         when(storageService.load(fileName)).thenReturn(path);
 
         List<Film> result = csvParceService.parseCsvFile(fileName);
-        Assertions.assertEquals(1,result.size());
+        System.out.println(result);
+        Assertions.assertEquals(7,result.size());
         Assertions.assertEquals("Over the Hill to the Poorhouse", result.get(0).getTitle());
+
 
     }
 }

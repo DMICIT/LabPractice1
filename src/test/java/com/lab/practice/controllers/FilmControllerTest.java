@@ -1,18 +1,23 @@
 package com.lab.practice.controllers;
 
 import com.lab.practice.entity.Film;
+import com.lab.practice.entity.FilmList;
 import com.lab.practice.service.CsvParceService;
+import com.lab.practice.service.StorageService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
-import static org.mockito.BDDMockito.given;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -20,33 +25,35 @@ class FilmControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
-    @MockBean
+    @Autowired
     CsvParceService csvParceService;
 
+    @MockBean
+    private StorageService storageService;
+
+    private String fileName = "controllerTestFile.csv";
+
+
     @Test
-    public void shouldReturnFilmList() {
+    public void shouldReturnFilmList() throws IOException {
 
-            Film film1 = new Film("фильм1","жанр1" );
-            Film film2 = new Film("фильм2","жанр2" );
-            Film film3 = new Film("фильм3","жанр3" );
-            List<Film> films = new ArrayList<>();
-            films.add(film1);
-            films.add(film2);
-            films.add(film3);
+        ClassPathResource resource = new ClassPathResource(fileName, getClass());
+        Path path = resource.getFile().toPath();
+        when(storageService.load(fileName)).thenReturn(path);
 
-            given(csvParceService.parseCsvFile("controllerTestFile.csv")).willReturn(films);
+        List<Film> expectedFilmList = csvParceService.parseCsvFile(fileName);
 
-            Map<String, String> map = new HashMap<>();
-            map.put("fileName", "controllerTestFile.csv");
-            ResponseEntity<String> response = restTemplate.getForEntity("/films?fileName=controllerTestFile.csv", String.class, "controllerTestFile.csv");
-            assertThat(response.getStatusCode().is2xxSuccessful());
-            assertThat(response.getBody()).contains("фильм1");
-            assertThat(response.getBody()).contains("фильм2");
-            assertThat(response.getBody()).contains("фильм3");
-            assertThat(response.getBody()).contains("жанр1");
-            assertThat(response.getBody()).contains("жанр2");
-            assertThat(response.getBody()).contains("жанр3");
-            assertThat(response.getBody()).isEqualTo("{\"filmList\":[{\"id\":0,\"title\":\"фильм1\",\"releaseDate\":null,\"color\":null,\"genre\":\"жанр1\",\"language\":null,\"country\":null,\"rating\":null,\"leadActor\":null,\"directorName\":null,\"leadActorFBLikes\":0,\"castFBLikes\":0,\"directorFBLikes\":0,\"movieFBLikes\":0,\"imdbScore\":0.0,\"totalReview\":0,\"duration\":0,\"revenue\":0,\"budget\":0},{\"id\":0,\"title\":\"фильм2\",\"releaseDate\":null,\"color\":null,\"genre\":\"жанр2\",\"language\":null,\"country\":null,\"rating\":null,\"leadActor\":null,\"directorName\":null,\"leadActorFBLikes\":0,\"castFBLikes\":0,\"directorFBLikes\":0,\"movieFBLikes\":0,\"imdbScore\":0.0,\"totalReview\":0,\"duration\":0,\"revenue\":0,\"budget\":0},{\"id\":0,\"title\":\"фильм3\",\"releaseDate\":null,\"color\":null,\"genre\":\"жанр3\",\"language\":null,\"country\":null,\"rating\":null,\"leadActor\":null,\"directorName\":null,\"leadActorFBLikes\":0,\"castFBLikes\":0,\"directorFBLikes\":0,\"movieFBLikes\":0,\"imdbScore\":0.0,\"totalReview\":0,\"duration\":0,\"revenue\":0,\"budget\":0}]}");
-        }
- }
+        Map<String, String> map = new HashMap<>();
+        map.put("fileName", fileName);
+
+        ResponseEntity<FilmList> response = restTemplate.getForEntity("/films?fileName=" + fileName, FilmList.class, fileName);
+        FilmList body = response.getBody();
+        assert body != null;
+        List<Film> resultFilmList = body.getFilmList();
+
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
+        Assertions.assertEquals(expectedFilmList,resultFilmList);
+
+    }
+}
 

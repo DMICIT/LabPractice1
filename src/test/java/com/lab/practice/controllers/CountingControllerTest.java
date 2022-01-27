@@ -2,19 +2,25 @@ package com.lab.practice.controllers;
 
 import com.lab.practice.service.CountingService;
 import com.lab.practice.service.StorageService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 
+import java.io.IOException;
+import java.nio.file.Path;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CountingControllerTest {
@@ -23,39 +29,54 @@ class CountingControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @MockBean
+    @Autowired
     private CountingService countingService;
+    @MockBean
+    private StorageService storageService;
 
+    private String fileName = "controllerTestFile.csv";
+    private String columnName = "budget";
 
 
     @Test
-    void getMaxValue() {
+    void getMaxValue() throws IOException {
 
-        given(countingService.maxValue("controllerTestFile.csv","budget")).willReturn(10l);
+        ClassPathResource resource = new ClassPathResource(fileName, getClass());
+        Path path = resource.getFile().toPath();
+        when(storageService.load(fileName)).thenReturn(path);
+
+        long expectedMaxValue = countingService.maxValue(fileName, "budget");
 
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
-        map.add("fileName","controllerTestFile.csv");
+        map.add("fileName",fileName);
         map.add("columnName","budget");
 
-        ResponseEntity<Long> entity = restTemplate.getForEntity("/maxValue?fileName=IMDb_Movie_Database.csv&columnName=budget", Long.class, map);
-        assertThat(entity.getStatusCode().is2xxSuccessful());
-        assertThat(entity.getBody().equals(10l));
+        ResponseEntity<Long> entity = restTemplate.getForEntity("/maxValue?fileName="+ fileName +"&columnName=" + columnName, Long.class, map);
+        Long result = entity.getBody();
 
+        Assertions.assertTrue(entity.getStatusCode().is2xxSuccessful());
+        Assertions.assertEquals(expectedMaxValue,result);
 
     }
 
     @Test
-    void getSum() {
+    void getSum() throws IOException {
 
-        given(countingService.sum("controllerTestFile.csv","budget")).willReturn(20L);
+        ClassPathResource resource = new ClassPathResource(fileName, getClass());
+        Path path = resource.getFile().toPath();
+        when(storageService.load(fileName)).thenReturn(path);
 
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
-        map.add("fileName","controllerTestFile.csv");
+        map.add("fileName",fileName);
         map.add("columnName","budget");
 
-        ResponseEntity<Long> entity = restTemplate.getForEntity("/sum?fileName=IMDb_Movie_Database.csv&columnName=budget", Long.class, map);
-        assertThat(entity.getStatusCode().is2xxSuccessful());
-        assertThat(entity.getBody().equals(20L));
+        long expectedSum = countingService.sum(fileName, columnName);
+
+        ResponseEntity<Long> entity = restTemplate.getForEntity("/sum?fileName="+ fileName +"&columnName=" + columnName, Long.class, map);
+        Long result = entity.getBody();
+
+        Assertions.assertTrue(entity.getStatusCode().is2xxSuccessful());
+        Assertions.assertEquals(expectedSum, result);
 
     }
 }
