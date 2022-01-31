@@ -21,7 +21,7 @@ class CountingServiceTest {
     private FileStorageService storageService;
 
     private final CountingData countingData = new CountingData("serviceTestFile.csv","budget");
-    private final CountingData countingData2 = new CountingData("serviceTestFile.csv","budget", "totalReviewHigher", "1000000");
+    private final CountingData countingData2 = new CountingData("serviceTestFile.csv","budget", "totalReviewHigher", "66");
 
     @Test
     void maxValue() throws IOException {
@@ -38,17 +38,15 @@ class CountingServiceTest {
     @Test
     void maxValueWithFilters() throws IOException {
 
-        ClassPathResource resource = new ClassPathResource(countingData.getFileName(), getClass());
+        ClassPathResource resource = new ClassPathResource(countingData2.getFileName(), getClass());
         Path path = resource.getFile().toPath();
-        when(storageService.load(countingData.getFileName())).thenReturn(path);
+        when(storageService.load(countingData2.getFileName())).thenReturn(path);
 
         long result = countingService.maxValue(countingData2);
 
         Assertions.assertEquals(6000000, result);
 
     }
-
-
 
     @Test
     void sum() throws IOException {
@@ -60,18 +58,17 @@ class CountingServiceTest {
         long result = countingService.sum(countingData);
 
         Assertions.assertEquals(11027000, result);
-
     }
 
     @Test
     void sumWithFilters() throws IOException {
 
-        ClassPathResource resource = new ClassPathResource(countingData.getFileName(), getClass());
+        ClassPathResource resource = new ClassPathResource(countingData2.getFileName(), getClass());
         Path path = resource.getFile().toPath();
-        when(storageService.load(countingData.getFileName())).thenReturn(path);
+        when(storageService.load(countingData2.getFileName())).thenReturn(path);
 
         long result = countingService.sum(countingData2);
 
-        Assertions.assertEquals(11027000, result);
+        Assertions.assertEquals(9500000, result);
     }
 }

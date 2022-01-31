@@ -18,12 +18,12 @@ public enum EFilterValues {
     IMDBLower("imdbLower", (film, input) -> Long.parseLong(input) > film.getImdbScore()),
     BudgetHigher("budgetHigher", (film, input) -> Long.parseLong(input) < film.getBudget()),
     BudgetLower("budgetLower", (film, input) -> Long.parseLong(input) > film.getBudget()),
-    RevenueHigher( "revenueHigher", (film, input) -> Long.parseLong(input) > film.getRevenue()),
-    RevenueLower( "revenueLower", (film, input) -> Long.parseLong(input) < film.getRevenue()),
-    DurationHigher("durationHigher", (film, input) -> Long.parseLong(input) > film.getDuration()),
-    DurationLower("durationLower", (film, input) -> Long.parseLong(input) < film.getDuration()),
-    TotalReviewHigher("totalReviewHigher", (film, input) -> Long.parseLong(input) > film.getTotalReview()),
-    TotalReviewLower("totalReviewLower", (film, input) -> Long.parseLong(input) < film.getTotalReview());
+    RevenueHigher( "revenueHigher", (film, input) -> Long.parseLong(input) < film.getRevenue()),
+    RevenueLower( "revenueLower", (film, input) -> Long.parseLong(input) > film.getRevenue()),
+    DurationHigher("durationHigher", (film, input) -> Long.parseLong(input) < film.getDuration()),
+    DurationLower("durationLower", (film, input) -> Long.parseLong(input) > film.getDuration()),
+    TotalReviewHigher("totalReviewHigher", (film, input) -> Long.parseLong(input) < film.getTotalReview()),
+    TotalReviewLower("totalReviewLower", (film, input) -> Long.parseLong(input) > film.getTotalReview());
 
     private String key;
     private FilmFilter filmFilter;
