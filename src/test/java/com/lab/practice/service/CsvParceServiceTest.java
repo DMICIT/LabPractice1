@@ -30,11 +30,10 @@ class CsvParceServiceTest {
     @Mock
     private FileStorageService storageService;
 
-    private String fileName = "serviceTestFile.csv";
-
     @Test
     public void parseCsvFileTest() throws IOException {
 
+        String fileName = "serviceTestFile.csv";
         ClassPathResource resource = new ClassPathResource(fileName, getClass());
         Path path = resource.getFile().toPath();
 
@@ -44,7 +43,6 @@ class CsvParceServiceTest {
         System.out.println(result);
         Assertions.assertEquals(7,result.size());
         Assertions.assertEquals("Over the Hill to the Poorhouse", result.get(0).getTitle());
-
 
     }
 }

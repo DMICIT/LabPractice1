@@ -31,12 +31,10 @@ class FilmControllerTest {
     @MockBean
     private StorageService storageService;
 
-    private String fileName = "controllerTestFile.csv";
-
-
     @Test
     public void shouldReturnFilmList() throws IOException {
 
+        String fileName = "controllerTestFile.csv";
         ClassPathResource resource = new ClassPathResource(fileName, getClass());
         Path path = resource.getFile().toPath();
         when(storageService.load(fileName)).thenReturn(path);
@@ -53,7 +51,8 @@ class FilmControllerTest {
 
         Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals(expectedFilmList,resultFilmList);
-
     }
+
+
 }
 
