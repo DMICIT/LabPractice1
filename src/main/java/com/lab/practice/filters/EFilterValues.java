@@ -23,7 +23,7 @@ public enum EFilterValues {
     DurationHigher("durationHigher", (film, input) -> Long.parseLong(input) > film.getDuration()),
     DurationLower("durationLower", (film, input) -> Long.parseLong(input) < film.getDuration()),
     TotalReviewHigher("totalReviewHigher", (film, input) -> Long.parseLong(input) > film.getTotalReview()),
-    TotalReviewLower("totalReviewLower", (film, input) -> Long.parseLong(input) > film.getTotalReview());
+    TotalReviewLower("totalReviewLower", (film, input) -> Long.parseLong(input) < film.getTotalReview());
 
     private String key;
     private FilmFilter filmFilter;

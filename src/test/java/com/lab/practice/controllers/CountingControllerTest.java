@@ -1,5 +1,6 @@
 package com.lab.practice.controllers;
 
+import com.lab.practice.data.CountingData;
 import com.lab.practice.service.CountingService;
 import com.lab.practice.service.StorageService;
 import org.junit.jupiter.api.Assertions;
@@ -32,24 +33,23 @@ class CountingControllerTest {
     @MockBean
     private StorageService storageService;
 
-    private final String fileName = "controllerTestFile.csv";
-    private final String columnName = "budget";
+    private final CountingData countingData = new CountingData("controllerTestFile.csv","budget");
 
 
     @Test
     void getMaxValue() throws IOException {
 
-        ClassPathResource resource = new ClassPathResource(fileName, getClass());
+        ClassPathResource resource = new ClassPathResource(countingData.getFileName(), getClass());
         Path path = resource.getFile().toPath();
-        when(storageService.load(fileName)).thenReturn(path);
+        when(storageService.load(countingData.getFileName())).thenReturn(path);
 
-        long expectedMaxValue = countingService.maxValue(fileName, "budget");
+        long expectedMaxValue = countingService.maxValue(countingData);
 
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
-        map.add("fileName",fileName);
-        map.add("columnName",columnName);
+        map.add("fileName",countingData.getFileName());
+        map.add("columnName",countingData.getFileName());
 
-        ResponseEntity<Long> entity = restTemplate.getForEntity("/maxValue?fileName="+ fileName +"&columnName=" + columnName, Long.class, map);
+        ResponseEntity<Long> entity = restTemplate.getForEntity("/maxValue?fileName="+ countingData.getFileName() +"&columnName=" + countingData.getColumnName(), Long.class, map);
         Long result = entity.getBody();
 
         Assertions.assertTrue(entity.getStatusCode().is2xxSuccessful());
@@ -59,17 +59,17 @@ class CountingControllerTest {
     @Test
     void getSum() throws IOException {
 
-        ClassPathResource resource = new ClassPathResource(fileName, getClass());
+        ClassPathResource resource = new ClassPathResource(countingData.getFileName(), getClass());
         Path path = resource.getFile().toPath();
-        when(storageService.load(fileName)).thenReturn(path);
+        when(storageService.load(countingData.getFileName())).thenReturn(path);
 
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
-        map.add("fileName",fileName);
-        map.add("columnName",columnName);
+        map.add("fileName",countingData.getFileName());
+        map.add("columnName",countingData.getColumnName());
 
-        long expectedSum = countingService.sum(fileName, columnName);
+        long expectedSum = countingService.sum(countingData);
 
-        ResponseEntity<Long> entity = restTemplate.getForEntity("/sum?fileName="+ fileName +"&columnName=" + columnName, Long.class, map);
+        ResponseEntity<Long> entity = restTemplate.getForEntity("/sum?fileName="+ countingData.getFileName() +"&columnName=" + countingData.getColumnName(), Long.class, map);
         Long result = entity.getBody();
 
         Assertions.assertTrue(entity.getStatusCode().is2xxSuccessful());
@@ -79,14 +79,14 @@ class CountingControllerTest {
     @Test
     void status500Test() throws IOException {
 
-        ClassPathResource resource = new ClassPathResource(fileName, getClass());
+        ClassPathResource resource = new ClassPathResource(countingData.getFileName(), getClass());
         Path path = resource.getFile().toPath();
-        when(storageService.load(fileName)).thenReturn(path);
+        when(storageService.load(countingData.getFileName())).thenReturn(path);
 
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
-        map.add("fileName",fileName);
+        map.add("fileName",countingData.getFileName());
         map.add("columnName","wrongColumnName");
-        ResponseEntity<Object> entity = restTemplate.getForEntity("/maxValue?fileName="+ fileName +"&columnName=" + "wrongColumnName", Object.class, map);
+        ResponseEntity<Object> entity = restTemplate.getForEntity("/maxValue?fileName="+ countingData.getFileName() +"&columnName=" + "wrongColumnName", Object.class, map);
 
         Assertions.assertTrue(entity.getStatusCode().is5xxServerError());
 

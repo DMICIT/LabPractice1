@@ -1,8 +1,10 @@
 package com.lab.practice.service;
 
+import com.lab.practice.data.CountingData;
 import com.lab.practice.entity.Film;
 import com.lab.practice.filters.ColumnMapper;
 import com.lab.practice.filters.EFilterValues;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,16 @@ public class CountingService {
         mapColumnName.put("revenue", Film::getRevenue);
     }
 
-    public long maxValue(String fileName, String columnName) {
+    public long maxValue(CountingData countingData){
+        if(StringUtils.isNotEmpty(countingData.getFilterKey()) && StringUtils.isNotEmpty(countingData.getValue())){
+
+            return maxValue(countingData.getFileName(), countingData.getColumnName(),
+                    countingData.getFilterKey(), countingData.getValue());
+        }
+        return maxValue(countingData.getFileName(), countingData.getColumnName());
+    }
+
+    private long maxValue(String fileName, String columnName) {
         List<Film> films = csvParceService.parseCsvFile(fileName);
         ColumnMapper columnMapper = mapColumnName.get(columnName);
 
@@ -44,8 +55,7 @@ public class CountingService {
                 .orElse(0);
     }
 
-    // кто-то говорил что можно запихнуть до 4 параметров чтоб не создавать новый объект. Так вот ... ))
-    public long maxValue(String fileName, String columnName, String filterKey, String value) {
+    private long maxValue(String fileName, String columnName, String filterKey, String value) {
 
         List<Film> films = csvParceService.parseCsvFile(fileName);
         ColumnMapper columnMapper = mapColumnName.get(columnName);
@@ -64,7 +74,16 @@ public class CountingService {
                 .orElse(0);
     }
 
-    public long sum(String fileName, String columnName) {
+    public long sum(CountingData countingData){
+        if(StringUtils.isNotEmpty(countingData.getFilterKey()) && StringUtils.isNotEmpty(countingData.getValue())){
+
+            return sum(countingData.getFileName(), countingData.getColumnName(),
+                    countingData.getFilterKey(), countingData.getValue());
+        }
+        return sum(countingData.getFileName(), countingData.getColumnName());
+    }
+
+    private long sum(String fileName, String columnName) {
         List<Film> films = csvParceService.parseCsvFile(fileName);
         ColumnMapper columnMapper = mapColumnName.get(columnName);
         if (columnMapper == null) {
@@ -75,8 +94,7 @@ public class CountingService {
                 .sum();
     }
 
-    public long sum(String fileName, String columnName, String filterKey, String value) {
-        List<Film> films = csvParceService.parseCsvFile(fileName);
+    private long sum(String fileName, String columnName, String filterKey, String value) {
         ColumnMapper columnMapper = mapColumnName.get(columnName);
         EFilterValues filterValue = Stream.of(EFilterValues.values())
                 .filter(eFilterValues -> eFilterValues.matchKey(filterKey))
@@ -85,8 +103,11 @@ public class CountingService {
         if (columnMapper == null) {
             throw new IllegalArgumentException("Not valid column");
         }
+        List<Film> films = csvParceService.parseCsvFile(fileName);
         return films.stream().filter(film -> filterValue.filter(film, value))
                 .mapToLong(columnMapper::apply)
                 .sum();
     }
+
+
 }
